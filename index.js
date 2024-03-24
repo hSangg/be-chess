@@ -4,14 +4,12 @@ import mongoose from 'mongoose';
 import bodyParser from 'body-parser'
 import fetch from "node-fetch";
 import dotenv from 'dotenv/config'
+import router from './routes/index.route.js'
 
 
-
-import UserRouter from './api/User.js'
 
 
 const app = express();
-
 app.use(bodyParser.urlencoded({
     extended: true
 }));
@@ -25,8 +23,8 @@ await mongoose
         console.log("Error", e)
     });
 
-app.use('/user', UserRouter)
-
+//router
+app.use('', router)
 app.listen(process.env.PORT, () => {
     console.log("listening on port ", process.env.PORT);
 })
