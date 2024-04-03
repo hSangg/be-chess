@@ -24,10 +24,7 @@ const UserSchema = new mongoose.Schema({
         type: String,
 
     },
-    create_at: {
-        type: Date
-    },
-    updated: {
+    created_at: {
         type: Date
     },
     phone_number: {

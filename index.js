@@ -23,6 +23,13 @@ await mongoose
         console.log("Error", e)
     });
 
+app.post('/calculateSum', (req, res) => {
+    const { number1, number2 } = req.body;
+    console.log(req)
+    const sum = parseInt(number1) + parseInt(number2);
+    res.json({ sum });
+});
+
 //router
 app.use('', router)
 app.listen(process.env.PORT, () => {
