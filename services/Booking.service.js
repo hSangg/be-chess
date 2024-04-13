@@ -28,7 +28,7 @@ const bookingService = async (req, res) => {
             created_at: createdAt
         })
         const savedReservations = newReservations.save();
-        return { reservations: savedReservations }
+        return { reservations: newReservations }
     } catch (err) {
         console.log(err)
         res.status(500).json({
