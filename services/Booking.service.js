@@ -1,9 +1,9 @@
 import reservations from "../models/reservations.model.js";
-
+import User from '../models/user.model.js'
 const bookingService = async (req, res) => {
     try {
-        const { id, user_id, room_id, start_date, end_date, price } = req.body;
-        if (!id || !user_id || !room_id || !start_date || !end_date || !price) {
+        const { user_id, room_id, start_date, end_date, price } = req.body;
+        if (!user_id || !room_id || !start_date || !end_date || !price) {
             return res.status(400).json({
                 status: "FAILED",
                 message: "Missing fields"
@@ -17,9 +17,9 @@ const bookingService = async (req, res) => {
         const daysDiff = Math.floor(millisecondsDiff / (1000 * 60 * 60 * 24));
         const total = daysDiff * price;
         const createdAt = Date.now();
+        const user = await User.findOne({ _id: user_id })
         const newReservations = new reservations({
-            id,
-            user_id,
+            user,
             room_id,
             start_date: startDate,
             end_date: endDate,

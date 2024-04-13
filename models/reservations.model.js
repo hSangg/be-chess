@@ -1,12 +1,8 @@
 import mongoose from "mongoose";
 
 const RevservationsSchema = new mongoose.Schema({
-    id: {
-        type: String,
-        required: [true, 'missing id']
-    },
-    user_id: {
-        type: String,
+    user: {
+        type: Object,
         required: [true, 'missing user_id']
     },
     room_id: {
