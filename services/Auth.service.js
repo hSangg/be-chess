@@ -40,6 +40,7 @@ const registerService = async (req, res) => {
     return { user: null };
   }
 };
+
 const loginService = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -53,20 +54,26 @@ const loginService = async (req, res) => {
     }
 
     const data = await User.findOne({ email });
-
+    console.log("data ", data);
     if (data) {
       const hashedPassword = data.password;
       const result = await bcrypt.compare(password, hashedPassword);
 
       if (result) {
-        console.log(result);
         return { user: data };
+      } else {
+        res.status(401).json({
+          status: 401,
+          message: "Invalid credential",
+        });
+        return { user: null };
       }
     } else {
       res.status(401).json({
         status: 401,
         message: "Invalid credential",
       });
+
       return { user: null };
     }
   } catch (err) {
