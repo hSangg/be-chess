@@ -12,12 +12,13 @@ const register = async (req, res) => {
 };
 
 const login = async (req, res) => {
-  const { user } = await loginService(req, res);
+  const { user, token } = await loginService(req, res);
   if (user) {
     res.status(200).json({
       status: "SUCCESS",
       message: "Signed In",
       data: user,
+      token: token
     });
   }
 };
