@@ -1,4 +1,4 @@
-import { registerService, loginService } from "../services/Auth.service.js";
+import { registerService, loginService, forgotPasswordService } from "../services/Auth.service.js";
 
 const register = async (req, res) => {
   const { user } = await registerService(req, res);
@@ -23,4 +23,20 @@ const login = async (req, res) => {
   }
 };
 
-export { register, login };
+const forgotPassword = async (req, res) => {
+  const { user, status, message } = await forgotPasswordService(req, res);
+  if (user) {
+    res.status(status).json({
+      status: "SUCCESS",
+      message: message,
+      data: user
+    })
+  }
+  else {
+    res.status(status).json({
+      status: "FAILED",
+      message: message
+    })
+  }
+}
+export { register, login, forgotPassword };
