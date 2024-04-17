@@ -2,6 +2,9 @@ import User from "../models/user.model.js";
 import jwt from "jsonwebtoken"
 import bcrypt from "bcrypt";
 import dotenv from "dotenv"
+import nodemailer from "nodemailer"
+import Randomstring from "randomstring";
+
 
 dotenv.config()
 
@@ -34,7 +37,7 @@ const registerService = async (req, res) => {
     });
 
     const savedUser = await newUser.save();
-
+    savedUser.password = undefined;
     return { user: savedUser };
   } catch (err) {
     console.error("Error:", err);
@@ -103,4 +106,95 @@ const loginService = async (req, res) => {
   }
 };
 
-export { registerService, loginService };
+const forgotPasswordService = async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      return { status: 400, message: "Missing Email" }
+    }
+    const user = await User.findOne({ email: email })
+    if (!user) {
+      return { status: 404, message: "User not found" }
+    }
+    let testAccount = await nodemailer.createTestAccount();
+    const mailerConfig = {
+      service: 'gmail',
+      auth: {
+        user: 'testlaravelalala@gmail.com',
+        pass: 'coflwwdlhdvdnjsg'
+      }
+    }
+    const transporter = nodemailer.createTransport(mailerConfig);
+    const randomPassword = Randomstring.generate({
+      length: 8,
+      charset: 'alphabetic'
+    });
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(randomPassword, saltRounds);
+    user.password = hashedPassword;
+    const savedUser = await user.save();
+
+    const message = `<!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>Home</title>
+    </head>
+        <body style = "margin:0;
+                        padding:0;
+                        font-family: Arial, sans-serif;
+                        line-height: 1.6;
+                        color:darkblue">
+            <div>
+                <h1 style="text-align:center;
+                            margin-top: 50px;
+                            color:darkblue;
+                        font-size:24px">New password</h1>
+                <p style="text-align:center;
+                            margin-top: 20px;
+                            color:darkblue;
+                            font-size:15px">Hello <strong>${user.name}</strong></p>
+                <p style="text-align:center;
+                            margin-top: 20px;
+                            color:darkblue;
+                            font-size:15px">We sending you your new password due to your request</p>
+                <p style="text-align:center;
+                            margin-top: 20px;
+                            color:darkblue;
+                            font-size:15px">Please do not share this password</p>
+                <p style="text-align:center;
+                            margin-top: 20px;
+                            color:darkblue;
+                            font-size:15px">Your new password is: </p>
+                <p style="text-align:center;
+                            margin-top: 20px;
+                            color:darkblue;
+                            font-size:30px"><strong>${randomPassword}</strong></p>
+                <p style="text-align:center;
+                            margin-top: 20px;
+                            color:darkblue;
+                            font-size:15px">Use this password to login to your account</p>
+                <p style="text-align:center;
+                            margin-top: 20px;
+                            color:darkblue;
+                            font-size:15px">We just lazy to use the OTP, don't judge us</p>
+            </div>
+    </body>
+    </html>`
+    transporter.sendMail({
+      from: '"Airbnb" <AirbnbClone@gmail.com',
+      to: email,
+      subject: 'Reset password',
+      html: message
+    })
+    savedUser.password = undefined;
+    return { user: savedUser, status: 200, message: "Check your email for new password" };
+  }
+  catch (err) {
+    console.log(err)
+    throw err
+  }
+}
+export { registerService, loginService, forgotPasswordService };
