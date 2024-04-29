@@ -1,28 +1,26 @@
-import { Mongoose } from "mongoose";
+import { Timestamp } from "mongodb";
+import mongoose from "mongoose";
 
-const roomSchema = new Mongoose.roomSchema({
-    name: {
-        type: String
-    },
-    summary: {
-        type: String
-    },
+const roomSchema = new mongoose.Schema({
+    name: String,
+    summary: String,
     transit: String,
     house_rules: String,
-    thumbnail_url: String,
+    thumbnail_urls: String,
     host: Object,
     street: String,
     smart_location: String,
     country: String,
-    latitude: String,
-    longtitude: String,
+    latitude: Number,
+    longtitude: Number,
     room_type: String,
     bathRooms: Number,
     bedRooms: Number,
     beds: Number,
     price: Number,
     weekly_price: Number,
-    review: String
+    review: String,
+    created_at: Date,
 })
 
-export default Mongoose.model('room', roomSchema)
+export default mongoose.model('room', roomSchema)
