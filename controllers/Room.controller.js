@@ -20,7 +20,7 @@ const addRoom = async (req, res) => {
 
 const getRoom = async (req, res) => {
     const { rooms, err, message, status } = await getRoomService(req, res);
-    if (rooms) {
+    if (Array.isArray(rooms) && rooms.length > 0) {
         res.status(status).json({
             status: status,
             message: message,
@@ -28,6 +28,12 @@ const getRoom = async (req, res) => {
         })
     }
     else {
+        res.status(404).json({
+            status: 404,
+            message: "No rooms found"
+        })
+    }
+    if (status == 400) {
         res.status(status).json({
             status: status,
             message: message,

@@ -24,12 +24,11 @@ const login = async (req, res) => {
 };
 
 const forgotPassword = async (req, res) => {
-  const { user, status, message } = await forgotPasswordService(req, res);
-  if (user) {
+  const { status, message } = await forgotPasswordService(req, res);
+  if (status == 200) {
     res.status(status).json({
       status: "SUCCESS",
       message: message,
-      data: user
     })
   }
   else {

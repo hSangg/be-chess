@@ -4,7 +4,7 @@ import bcrypt from "bcrypt";
 import dotenv from "dotenv"
 import nodemailer from "nodemailer"
 import Randomstring from "randomstring";
-
+import otp from "../models/otp.model.js"
 
 dotenv.config()
 
@@ -125,15 +125,15 @@ const forgotPasswordService = async (req, res) => {
       }
     }
     const transporter = nodemailer.createTransport(mailerConfig);
-    const randomPassword = Randomstring.generate({
-      length: 8,
+    const OTPGenerated = Randomstring.generate({
+      length: 6,
       charset: 'alphabetic'
     });
-    const saltRounds = 10;
-    const hashedPassword = await bcrypt.hash(randomPassword, saltRounds);
-    user.password = hashedPassword;
-    const savedUser = await user.save();
-
+    const newOTP = new otp({
+      user_id: user.user_id,
+      OTP: OTPGenerated
+    })
+    const savedOTP = newOTP.save();
     const message = `<!DOCTYPE html>
     <html lang="en">
     <head>
@@ -159,27 +159,23 @@ const forgotPasswordService = async (req, res) => {
                 <p style="text-align:center;
                             margin-top: 20px;
                             color:darkblue;
-                            font-size:15px">We sending you your new password due to your request</p>
+                            font-size:15px">Here is your OTP</p>
                 <p style="text-align:center;
                             margin-top: 20px;
                             color:darkblue;
-                            font-size:15px">Please do not share this password</p>
+                            font-size:15px">Please do not share this information</p>
                 <p style="text-align:center;
                             margin-top: 20px;
                             color:darkblue;
-                            font-size:15px">Your new password is: </p>
+                            font-size:15px">Your OTP is: </p>
                 <p style="text-align:center;
                             margin-top: 20px;
                             color:darkblue;
-                            font-size:30px"><strong>${randomPassword}</strong></p>
+                            font-size:30px"><strong>${OTPGenerated}</strong></p>
                 <p style="text-align:center;
                             margin-top: 20px;
                             color:darkblue;
-                            font-size:15px">Use this password to login to your account</p>
-                <p style="text-align:center;
-                            margin-top: 20px;
-                            color:darkblue;
-                            font-size:15px">We just lazy to use the OTP, don't judge us</p>
+                            font-size:15px">Use this OTP to validate and change your password</p>
             </div>
     </body>
     </html>`
@@ -189,8 +185,7 @@ const forgotPasswordService = async (req, res) => {
       subject: 'Reset password',
       html: message
     })
-    savedUser.password = undefined;
-    return { user: savedUser, status: 200, message: "Check your email for new password" };
+    return { status: 200, message: "Check your email for the OTP" };
   }
   catch (err) {
     console.log(err)
