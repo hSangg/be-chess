@@ -84,7 +84,7 @@ const getRoomService = async (req, res) => {
             min_price,
             max_price,
             is_sort_price
-        } = req.body
+        } = req.query
         const query = {}
         if (room_type)
             query.room_type = room_type
@@ -94,6 +94,7 @@ const getRoomService = async (req, res) => {
             query.min_price = { $gte: min_price }
         if (max_price)
             query.max_price = { $lte: max_price }
+        console.log(query)
         let result = await Room.find(query);
         if (is_sort_price == "ASC")
             result.sort({ price: 1 })
