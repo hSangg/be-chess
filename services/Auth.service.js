@@ -1,14 +1,15 @@
 import User from "../models/user.model.js";
-import jwt from "jsonwebtoken"
+import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
-import dotenv from "dotenv"
-import nodemailer from "nodemailer"
+import dotenv from "dotenv";
+import nodemailer from "nodemailer";
 import Randomstring from "randomstring";
-import otp from "../models/otp.model.js"
+import otp from "../models/otp.model.js";
+import { generateRandomFiveDigitNumberAsString } from "../utils/function.js";
 
-dotenv.config()
+dotenv.config();
 
-const { SECRET_CODE } = process.env.NODE_ENV !== "production"
+const { SECRET_CODE } = process.env.NODE_ENV !== "production";
 
 const registerService = async (req, res) => {
   console.log(req);
@@ -72,11 +73,11 @@ const loginService = async (req, res) => {
           {
             email: data.email,
             password: data.password,
-            _id: data._id
+            _id: data._id,
           },
           process.env.JWT_KEY,
           {
-            expiresIn: "6h"
+            expiresIn: "6h",
           }
         );
         data.password = undefined;
@@ -108,32 +109,30 @@ const loginService = async (req, res) => {
 
 const forgotPasswordService = async (req, res) => {
   try {
+    console.log("call forget password");
     const { email } = req.body;
     if (!email) {
-      return { status: 400, message: "Missing Email" }
+      return { status: 400, message: "Missing Email" };
     }
-    const user = await User.findOne({ email: email })
+    const user = await User.findOne({ email: email });
     if (!user) {
-      return { status: 404, message: "User not found" }
+      return { status: 404, message: "User not found" };
     }
     let testAccount = await nodemailer.createTestAccount();
     const mailerConfig = {
-      service: 'gmail',
+      service: "gmail",
       auth: {
-        user: 'testlaravelalala@gmail.com',
-        pass: 'coflwwdlhdvdnjsg'
-      }
-    }
+        user: "testlaravelalala@gmail.com",
+        pass: "coflwwdlhdvdnjsg",
+      },
+    };
     const transporter = nodemailer.createTransport(mailerConfig);
-    const OTPGenerated = Randomstring.generate({
-      length: 6,
-      charset: 'alphabetic'
-    });
+    const OTPGenerated = generateRandomFiveDigitNumberAsString();
     const newOTP = new otp({
       user_id: user.user_id,
-      OTP: OTPGenerated
-    })
-    const savedOTP = newOTP.save();
+      OTP: OTPGenerated,
+    });
+    const savedOTP = await newOTP.save();
     const message = `<!DOCTYPE html>
     <html lang="en">
     <head>
@@ -178,18 +177,17 @@ const forgotPasswordService = async (req, res) => {
                             font-size:15px">Use this OTP to validate and change your password</p>
             </div>
     </body>
-    </html>`
+    </html>`;
     transporter.sendMail({
       from: '"Airbnb" <AirbnbClone@gmail.com',
       to: email,
-      subject: 'Reset password',
-      html: message
-    })
+      subject: "Reset password",
+      html: message,
+    });
     return { status: 200, message: "Check your email for the OTP" };
+  } catch (err) {
+    console.log(err);
+    throw err;
   }
-  catch (err) {
-    console.log(err)
-    throw err
-  }
-}
+};
 export { registerService, loginService, forgotPasswordService };
