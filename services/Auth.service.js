@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken";
 import nodemailer from "nodemailer";
 import otp from "../models/otp.model.js";
 import User from "../models/user.model.js";
-import { generateRandomFiveDigitNumberAsString } from "../utils/function.js";
+import { generateRandomFiveDigitNumberAsString, generateRandomPassword } from "../utils/function.js";
 
 dotenv.config();
 
@@ -199,15 +199,81 @@ const checkOTPService = async (req, res) => {
       return { status: 400, message: "Missing email or OTP" };
     }
     const isValid = await otp.findOne({ email: email, OTP: OTP });
-    console.log("isValid: ", isValid);
+    //  console.log("isValid: ", isValid);
 
     if (!isValid) {
       return { status: 401, message: "Invalid OTP" };
     }
+    const user = await User.findOne({ email: email })
+    const newPassword = generateRandomPassword();
+    const saltRounds = 10;
 
+    const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
+    user.password = hashedPassword;
+    const savedUser = await user.save();
+    console.log(user)
+    const message = `<!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>Home</title>
+    </head>
+        <body style = "margin:0;
+                        padding:0;
+                        font-family: Arial, sans-serif;
+                        line-height: 1.6;
+                        color:darkblue">
+            <div>
+                <h1 style="text-align:center;
+                            margin-top: 50px;
+                            color:darkblue;
+                        font-size:24px">New password</h1>
+                <p style="text-align:center;
+                            margin-top: 20px;
+                            color:darkblue;
+                            font-size:15px">Hello <strong>${user.name}</strong></p>
+                <p style="text-align:center;
+                            margin-top: 20px;
+                            color:darkblue;
+                            font-size:15px">Here is your new auto generated password</p>
+                <p style="text-align:center;
+                            margin-top: 20px;
+                            color:darkblue;
+                            font-size:15px">Please do not share this information</p>
+                <p style="text-align:center;
+                            margin-top: 20px;
+                            color:darkblue;
+                            font-size:15px">Your new password is: </p>
+                <p style="text-align:center;
+                            margin-top: 20px;
+                            color:darkblue;
+                            font-size:30px"><strong>${newPassword}</strong></p>
+                <p style="text-align:center;
+                            margin-top: 20px;
+                            color:darkblue;
+                            font-size:15px">Use this OTP to validate and change your password</p>
+            </div>
+    </body>
+    </html>`;
+    const mailerConfig = {
+      service: "gmail",
+      auth: {
+        user: "testlaravelalala@gmail.com",
+        pass: "coflwwdlhdvdnjsg",
+      },
+    };
+    const transporter = nodemailer.createTransport(mailerConfig);
+    transporter.sendMail({
+      from: '"Airbnb" <AirbnbClone@gmail.com',
+      to: email,
+      subject: "Reset password",
+      html: message,
+    });
     return {
       status: 200,
-      message: "Congratulation! Have fun with your account🎉",
+      message: "Congratulation🎉! Check your email for your new password",
     };
   } catch (error) {
     return { status: 404, message: "Catch error" };
