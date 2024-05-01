@@ -4,7 +4,10 @@ import jwt from "jsonwebtoken";
 import nodemailer from "nodemailer";
 import otp from "../models/otp.model.js";
 import User from "../models/user.model.js";
-import { generateRandomFiveDigitNumberAsString, generateRandomPassword } from "../utils/function.js";
+import {
+  generateRandomFiveDigitNumberAsString,
+  generateRandomPassword,
+} from "../utils/function.js";
 
 dotenv.config();
 
@@ -204,14 +207,14 @@ const checkOTPService = async (req, res) => {
     if (!isValid) {
       return { status: 401, message: "Invalid OTP" };
     }
-    const user = await User.findOne({ email: email })
+    const user = await User.findOne({ email: email });
     const newPassword = generateRandomPassword();
     const saltRounds = 10;
 
     const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
     user.password = hashedPassword;
-    const savedUser = await user.save();
-    console.log(user)
+    await user.save();
+
     const message = `<!DOCTYPE html>
     <html lang="en">
     <head>
