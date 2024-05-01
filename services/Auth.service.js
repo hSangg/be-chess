@@ -1,10 +1,9 @@
-import User from "../models/user.model.js";
-import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import dotenv from "dotenv";
+import jwt from "jsonwebtoken";
 import nodemailer from "nodemailer";
-import Randomstring from "randomstring";
 import otp from "../models/otp.model.js";
+import User from "../models/user.model.js";
 import { generateRandomFiveDigitNumberAsString } from "../utils/function.js";
 
 dotenv.config();
@@ -12,7 +11,6 @@ dotenv.config();
 const { SECRET_CODE } = process.env.NODE_ENV !== "production";
 
 const registerService = async (req, res) => {
-  console.log(req);
   try {
     const { name, password, email, phone_number } = req.body;
 
@@ -129,10 +127,12 @@ const forgotPasswordService = async (req, res) => {
     const transporter = nodemailer.createTransport(mailerConfig);
     const OTPGenerated = generateRandomFiveDigitNumberAsString();
     const newOTP = new otp({
-      user_id: user.user_id,
+      email: user.email,
       OTP: OTPGenerated,
     });
-    const savedOTP = await newOTP.save();
+
+    await newOTP.save();
+
     const message = `<!DOCTYPE html>
     <html lang="en">
     <head>
@@ -190,4 +190,33 @@ const forgotPasswordService = async (req, res) => {
     throw err;
   }
 };
-export { registerService, loginService, forgotPasswordService };
+
+const checkOTPService = async (req, res) => {
+  try {
+    console.log("call forget password");
+    const { email, OTP } = req.body;
+    if (!email || !OTP) {
+      return { status: 400, message: "Missing email or OTP" };
+    }
+    const isValid = await otp.findOne({ email: email, OTP: OTP });
+    console.log("isValid: ", isValid);
+
+    if (!isValid) {
+      return { status: 401, message: "Invalid OTP" };
+    }
+
+    return {
+      status: 200,
+      message: "Congratulation! Have fun with your account🎉",
+    };
+  } catch (error) {
+    return { status: 404, message: "Catch error" };
+  }
+};
+
+export {
+  checkOTPService,
+  forgotPasswordService,
+  loginService,
+  registerService,
+};
