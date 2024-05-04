@@ -1,5 +1,6 @@
 import Room from "../models/room.model.js"
 import User from "../models/user.model.js"
+import Reservations from "../models/reservations.model.js"
 import { v2 as cloudinary } from 'cloudinary'
 import fs from "fs"
 const addRoomService = async (req, res) => {
@@ -30,22 +31,18 @@ const addRoomService = async (req, res) => {
     // }
     let image = "";
     try {
-        //req.files.image.tempFilePath != null) 
-        //     const file = req.files.image.tempFilePath
-        //     console.log(file)
-        //     const result = await cloudinary.uploader.upload(
-        //         file,
-        //         {
-        //             use_filename: true,
-        //             folder: 'upload',
-        //         }
-        //     )
-        //     fs.unlinkSync(file)
-        //     image = result.secure_url;
-        // 
-        image = image_url
-        console.log("this is image")
-        console.log(image)
+        const file = req.files.image.tempFilePath
+        console.log(file)
+        const result = await cloudinary.uploader.upload(
+            file,
+            {
+                use_filename: true,
+                folder: 'upload',
+            }
+        )
+        fs.unlinkSync(file)
+        image = result.secure_url;
+
         const host = await User.findOne({ _id: host_id })
         console.log(host)
         const newRoom = new Room({
@@ -120,4 +117,32 @@ const getRoomService = async (req, res) => {
     }
 }
 
-export { addRoomService, getRoomService }
+const getRoomInfoService = async (req, res) => {
+    const { room_id } = req.query
+    try {
+        const room = await Room.findOne({ _id: room_id })
+        const booked = await Reservations.find({ room: room })
+        let allDates = [Date];
+        allDates.shift();
+        const today = new Date();
+        booked.forEach(reservation => {
+            const startDate = new Date(reservation.start_date);
+            const endDate = new Date(reservation.end_date);
+            for (let date = startDate; date <= endDate; date.setDate(date.getDate() + 1)) {
+
+                if (date.getTime() >= today.getTime()) {
+                    allDates.push(new Date(date));
+                }
+            }
+        })
+        return { room, allDates, status: 200, message: "SUCCESS" }
+    }
+    catch (err) {
+        return {
+            status: 400,
+            message: "An error occur",
+            error: err.message
+        }
+    }
+}
+export { addRoomService, getRoomService, getRoomInfoService }

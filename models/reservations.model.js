@@ -5,8 +5,8 @@ const RevservationsSchema = new mongoose.Schema({
         type: Object,
         required: [true, 'missing user_id']
     },
-    room_id: {
-        type: String,
+    room: {
+        type: Object,
         required: [true, 'missing room_id']
     },
     start_date: {
@@ -19,10 +19,6 @@ const RevservationsSchema = new mongoose.Schema({
     },
     created_at: {
         type: Date
-    },
-    price: {
-        type: Number,
-        required: [true, 'missing price']
     },
     total: {
         type: Number
