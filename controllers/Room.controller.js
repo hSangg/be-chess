@@ -1,4 +1,4 @@
-import { addRoomService, getRoomService } from "../services/Room.service.js";
+import { addRoomService, getRoomInfoService, getRoomService } from "../services/Room.service.js";
 
 const addRoom = async (req, res) => {
     const { room, err, message, status } = await addRoomService(req, res);
@@ -41,4 +41,25 @@ const getRoom = async (req, res) => {
         })
     }
 }
-export { addRoom, getRoom }
+
+const getRoomInfo = async (req, res) => {
+    const { room, allDates, status, message, error } = await getRoomInfoService(req, res);
+    if (!error) {
+        res.status(status).json({
+            status: status,
+            message: message,
+            data: {
+                room,
+                bookedDate: allDates
+            }
+        })
+    } else {
+        res.status(status).json({
+            status: status,
+            message: message,
+            error: error
+        })
+    }
+
+}
+export { addRoom, getRoom, getRoomInfo }

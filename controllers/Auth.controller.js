@@ -17,6 +17,7 @@ const register = async (req, res) => {
 };
 
 const login = async (req, res) => {
+  console.log("call login")
   const { user, token } = await loginService(req, res);
   if (user) {
     res.status(200).json({
