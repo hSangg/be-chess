@@ -7,7 +7,7 @@ const addRoomService = async (req, res) => {
         summary,
         transit,
         house_rules,
-        host,
+        host_id,
         street,
         smart_location,
         country,
@@ -19,6 +19,7 @@ const addRoomService = async (req, res) => {
         beds,
         price,
         weekly_price,
+        image_url,
         review } = req.body;
     // if (!name || !summary || !house_rules || !transit || !req.files.image.tempFilePath || !host || !street || !smart_location || !country || !latitude
     //     || !longtitude || !room_type || !bathRooms || !bedRooms || !beds || !price || !weekly_price) {
@@ -27,18 +28,26 @@ const addRoomService = async (req, res) => {
     //         message: "Missing fields"
     //     });
     // }
+    let image = "";
     try {
-        const file = req.files.image.tempFilePath
-        console.log(file)
-        const result = await cloudinary.uploader.upload(
-            file,
-            {
-                use_filename: true,
-                folder: 'upload',
-            }
-        )
-        fs.unlinkSync(file)
-        const image = result.secure_url;
+        //req.files.image.tempFilePath != null) 
+        //     const file = req.files.image.tempFilePath
+        //     console.log(file)
+        //     const result = await cloudinary.uploader.upload(
+        //         file,
+        //         {
+        //             use_filename: true,
+        //             folder: 'upload',
+        //         }
+        //     )
+        //     fs.unlinkSync(file)
+        //     image = result.secure_url;
+        // 
+        image = image_url
+        console.log("this is image")
+        console.log(image)
+        const host = await User.findOne({ _id: host_id })
+        console.log(host)
         const newRoom = new Room({
             name,
             summary,
