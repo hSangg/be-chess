@@ -13,7 +13,7 @@ const addRoomService = async (req, res) => {
         smart_location,
         country,
         latitude,
-        longtitude,
+        longitude,
         room_type,
         bathRooms,
         bedRooms,
@@ -23,7 +23,7 @@ const addRoomService = async (req, res) => {
         image_url,
         review } = req.body;
     // if (!name || !summary || !house_rules || !transit || !req.files.image.tempFilePath || !host || !street || !smart_location || !country || !latitude
-    //     || !longtitude || !room_type || !bathRooms || !bedRooms || !beds || !price || !weekly_price) {
+    //     || !longitude || !room_type || !bathRooms || !bedRooms || !beds || !price || !weekly_price) {
     //     return res.status(400).json({
     //         status: "FAILED",
     //         message: "Missing fields"
@@ -55,7 +55,7 @@ const addRoomService = async (req, res) => {
             smart_location,
             country,
             latitude,
-            longtitude,
+            longitude,
             room_type,
             bathRooms,
             bedRooms,

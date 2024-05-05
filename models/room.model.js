@@ -12,7 +12,7 @@ const roomSchema = new mongoose.Schema({
     smart_location: String,
     country: String,
     latitude: Number,
-    longtitude: Number,
+    longitude: Number,
     room_type: String,
     bathRooms: Number,
     bedRooms: Number,
