@@ -84,33 +84,29 @@ const addRoomService = async (req, res) => {
 
 const getRoomService = async (req, res) => {
     try {
-        const {
-            room_type,
-            smart_location,
-            min_price,
-            max_price,
-            is_sort_price
-        } = req.query
-        const query = {}
-        if (room_type)
-            query.room_type = room_type
-        if (smart_location)
-            query.smart_location = smart_location
-        if (min_price)
-            query.min_price = { $gte: min_price }
-        if (max_price)
-            query.max_price = { $lte: max_price }
-        console.log(query)
+        const { room_type, smart_location, min_price, max_price, is_sort_price } = req.query;
+        const query = {};
+
+        if (room_type) query.room_type = room_type;
+        if (smart_location) query.smart_location = smart_location;
+        if (min_price || max_price) {
+            query.price = {}; // Tạo một object trống cho trường price
+            if (min_price) query.price.$gte = min_price;
+            if (max_price) query.price.$lte = max_price;
+        }
+
+        console.log(query);
         let result = await Room.find(query);
-        if (is_sort_price == "ASC")
-            result.sort({ price: 1 })
-        else if (is_sort_price == "DESC")
-            result.sort({ price: -1 })
+
+        if (is_sort_price == "ASC") result.sort({ price: 1 });
+        else if (is_sort_price == "DESC") result.sort({ price: -1 });
+
         return {
             status: 200,
             message: "SUCCESS",
             rooms: result
-        }
+        };
+
     }
     catch (err) {
         return { err: err.message, status: 400, message: "An error occur" }
