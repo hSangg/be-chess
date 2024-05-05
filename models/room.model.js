@@ -6,7 +6,7 @@ const roomSchema = new mongoose.Schema({
     summary: String,
     transit: String,
     house_rules: String,
-    thumbnail_urls: String,
+    thumbnail_urls: [String],
     host: Object,
     street: String,
     smart_location: String,

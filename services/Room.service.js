@@ -29,20 +29,7 @@ const addRoomService = async (req, res) => {
     //         message: "Missing fields"
     //     });
     // }
-    let image = "";
     try {
-        const file = req.files.image.tempFilePath
-        console.log(file)
-        const result = await cloudinary.uploader.upload(
-            file,
-            {
-                use_filename: true,
-                folder: 'upload',
-            }
-        )
-        fs.unlinkSync(file)
-        image = result.secure_url;
-
         const host = await User.findOne({ _id: host_id })
         console.log(host)
         const newRoom = new Room({
@@ -63,7 +50,7 @@ const addRoomService = async (req, res) => {
             price,
             weekly_price,
             review,
-            thumbnail_urls: image,
+            thumbnail_urls: [],
             created_at: Date.now()
         });
         const savedRoom = await newRoom.save();
@@ -141,4 +128,41 @@ const getRoomInfoService = async (req, res) => {
         }
     }
 }
-export { addRoomService, getRoomService, getRoomInfoService }
+
+const addImageToRoomService = async (req, res) => {
+    const { room_id } = req.body;
+    let image = ""
+    try {
+        const file = req.files.image.tempFilePath
+        console.log(file)
+        const result = await cloudinary.uploader.upload(
+            file,
+            {
+                use_filename: true,
+                folder: 'upload',
+            }
+        )
+        fs.unlinkSync(file)
+        image = result.secure_url;
+        const room = await Room.findOne({ _id: room_id })
+        if (!room)
+            return {
+                status: 404,
+                message: "Room not found"
+            }
+        room.thumbnail_urls.push(image)
+        await room.save();
+        return {
+            status: 200,
+            message: "Added image to room",
+            room: room
+        }
+    } catch (err) {
+        return {
+            status: 400,
+            message: "An error occur",
+            error: err.message
+        }
+    }
+}
+export { addRoomService, getRoomService, getRoomInfoService, addImageToRoomService }

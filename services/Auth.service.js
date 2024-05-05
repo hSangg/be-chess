@@ -34,7 +34,7 @@ const registerService = async (req, res) => {
       email,
       password: hashedPassword,
       phone_number,
-      create_at: createdAt,
+      created_at: createdAt,
       update_at: createdAt,
     });
 
