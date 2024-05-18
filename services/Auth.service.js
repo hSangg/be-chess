@@ -15,9 +15,9 @@ const { SECRET_CODE } = process.env.NODE_ENV !== "production";
 
 const registerService = async (req, res) => {
   try {
-    const { name, password, email, phone_number } = req.body;
+    const { name, password, email } = req.body;
 
-    if (!name || !password || !email || !phone_number) {
+    if (!name || !password || !email) {
       return res.status(400).json({
         status: "FAILED",
         message: "Missing required fields",
@@ -33,7 +33,7 @@ const registerService = async (req, res) => {
       name,
       email,
       password: hashedPassword,
-      phone_number,
+
       created_at: createdAt,
       update_at: createdAt,
     });
