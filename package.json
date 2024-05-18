@@ -23,7 +23,7 @@
     "google": "^2.1.0",
     "jsonwebtoken": "^9.0.2",
     "memory": "^0.0.3",
-    "mongodb": "^6.5.0",
+    "mongodb": "^6.6.2",
     "mongoose": "^8.2.3",
     "node-fetch": "^2.6.6",
     "nodemailer": "^6.9.13",
