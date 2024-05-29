@@ -1,8 +1,8 @@
 import express from "express";
-import { saveGame } from "../controllers/Game.controller.js";
+import { saveGame, loadGame } from "../controllers/Game.controller.js";
 
 const router = express.Router();
 
 router.post('/save', saveGame)
-
+router.get('/load', loadGame)
 export default router;

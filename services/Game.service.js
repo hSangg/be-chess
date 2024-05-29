@@ -24,4 +24,19 @@ const saveGameService = async (req, res) => {
     }
 }
 
-export { saveGameService };
+const loadGameService = async (req, res) => {
+    try {
+        const listGame = await gameModel.find({});
+        res.status(200).json({
+            status: 200,
+            listGame: listGame
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            status: 500,
+            message: 'Server Error'
+        });
+    }
+};
+export { saveGameService, loadGameService };
