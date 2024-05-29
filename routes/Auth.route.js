@@ -10,6 +10,4 @@ const router = express.Router();
 
 router.post("/signUp", register);
 router.post("/signIn", login);
-// router.post("/forgotPassword", forgotPassword);
-// router.post("/checkOtp", checkOTP);
 export default router;
