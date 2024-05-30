@@ -1,4 +1,4 @@
-import { loadGameService, saveGameService } from "../services/Game.service.js";
+import { loadGameByIdService, loadGameService, saveGameService } from "../services/Game.service.js";
 
 const saveGame = async (req, res) => {
     await saveGameService(req, res);
@@ -7,4 +7,8 @@ const saveGame = async (req, res) => {
 const loadGame = async (req, res) => {
     await loadGameService(req, res);
 }
-export { saveGame, loadGame }
+
+const loadGameById = async (req, res) => {
+    await loadGameByIdService(req, res);
+}
+export { saveGame, loadGame, loadGameById }
