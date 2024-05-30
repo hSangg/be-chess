@@ -2,7 +2,6 @@ import {
   registerService,
   loginService,
   forgotPasswordService,
-  checkOTPService,
 } from "../services/Auth.service.js";
 
 const register = async (req, res) => {
@@ -44,20 +43,7 @@ const forgotPassword = async (req, res) => {
   }
 };
 
-const checkOTP = async (req, res) => {
-  const { status, message } = await checkOTPService(req, res);
-
-  if (status == 200) {
-    res.status(status).json({
-      status: "SUCCESS",
-      message: message,
-    });
-  } else {
-    res.status(status).json({
-      status: "FAILED",
-      message: message,
-    });
-  }
-};
-
-export { register, login, forgotPassword, checkOTP };
+export {
+  forgotPassword,
+  register,login
+}

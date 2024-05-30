@@ -107,11 +107,11 @@ const loginService = async (req, res) => {
     return { user: null };
   }
 };
-
 const forgotPasswordService = async (req, res) => {
   try {
     console.log("call forget password");
     const { email } = req.body;
+    console.log("email: ", email)
     if (!email) {
       return { status: 400, message: "Missing Email" };
     }
@@ -123,91 +123,12 @@ const forgotPasswordService = async (req, res) => {
     const mailerConfig = {
       service: "gmail",
       auth: {
-        user: "testlaravelalala@gmail.com",
-        pass: "coflwwdlhdvdnjsg",
+        user: "hoai.sang050@gmail.com",
+        pass: "llfm vrge vztv bufc",
       },
     };
     const transporter = nodemailer.createTransport(mailerConfig);
-    const OTPGenerated = generateRandomFiveDigitNumberAsString();
-    const newOTP = new otp({
-      email: user.email,
-      OTP: OTPGenerated,
-    });
-
-    await newOTP.save();
-
-    const message = `<!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta http-equiv="X-UA-Compatible" content="ie=edge">
-        <title>Home</title>
-    </head>
-        <body style = "margin:0;
-                        padding:0;
-                        font-family: Arial, sans-serif;
-                        line-height: 1.6;
-                        color:darkblue">
-            <div>
-                <h1 style="text-align:center;
-                            margin-top: 50px;
-                            color:darkblue;
-                        font-size:24px">New password</h1>
-                <p style="text-align:center;
-                            margin-top: 20px;
-                            color:darkblue;
-                            font-size:15px">Hello <strong>${user.name}</strong></p>
-                <p style="text-align:center;
-                            margin-top: 20px;
-                            color:darkblue;
-                            font-size:15px">Here is your OTP</p>
-                <p style="text-align:center;
-                            margin-top: 20px;
-                            color:darkblue;
-                            font-size:15px">Please do not share this information</p>
-                <p style="text-align:center;
-                            margin-top: 20px;
-                            color:darkblue;
-                            font-size:15px">Your OTP is: </p>
-                <p style="text-align:center;
-                            margin-top: 20px;
-                            color:darkblue;
-                            font-size:30px"><strong>${OTPGenerated}</strong></p>
-                <p style="text-align:center;
-                            margin-top: 20px;
-                            color:darkblue;
-                            font-size:15px">Use this OTP to validate and change your password</p>
-            </div>
-    </body>
-    </html>`;
-    transporter.sendMail({
-      from: '"Airbnb" <AirbnbClone@gmail.com',
-      to: email,
-      subject: "Reset password",
-      html: message,
-    });
-    return { status: 200, message: "Check your email for the OTP" };
-  } catch (err) {
-    console.log(err);
-    throw err;
-  }
-};
-
-const checkOTPService = async (req, res) => {
-  try {
-    console.log("call forget password");
-    const { email, OTP } = req.body;
-    if (!email || !OTP) {
-      return { status: 400, message: "Missing email or OTP" };
-    }
-    const isValid = await otp.findOne({ email: email, OTP: OTP });
-    //  console.log("isValid: ", isValid);
-
-    if (!isValid) {
-      return { status: 401, message: "Invalid OTP" };
-    }
-    const user = await User.findOne({ email: email });
+    
     const newPassword = generateRandomPassword();
     const saltRounds = 10;
 
@@ -221,71 +142,97 @@ const checkOTPService = async (req, res) => {
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta http-equiv="X-UA-Compatible" content="ie=edge">
-        <title>Home</title>
+        <title>Reset Password - King Chess</title>
+        <style>
+          body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333333;
+            background-color: #f4f4f9;
+          }
+          .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+          }
+          .header {
+            background-color: #333333;
+            color: #ffffff;
+            padding: 20px;
+            text-align: center;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+          }
+          .header h1 {
+            margin: 0;
+            font-size: 24px;
+          }
+          .content {
+            padding: 20px;
+            text-align: center;
+          }
+          .content p {
+            margin: 10px 0;
+            font-size: 15px;
+            color: #333333;
+          }
+          .password {
+            font-size: 24px;
+            font-weight: bold;
+            color: #ff0000;
+            margin: 20px 0;
+          }
+          .footer {
+            margin-top: 20px;
+            font-size: 12px;
+            color: #999999;
+            text-align: center;
+          }
+        </style>
     </head>
-        <body style = "margin:0;
-                        padding:0;
-                        font-family: Arial, sans-serif;
-                        line-height: 1.6;
-                        color:darkblue">
-            <div>
-                <h1 style="text-align:center;
-                            margin-top: 50px;
-                            color:darkblue;
-                        font-size:24px">New password</h1>
-                <p style="text-align:center;
-                            margin-top: 20px;
-                            color:darkblue;
-                            font-size:15px">Hello <strong>${user.name}</strong></p>
-                <p style="text-align:center;
-                            margin-top: 20px;
-                            color:darkblue;
-                            font-size:15px">Here is your new auto generated password</p>
-                <p style="text-align:center;
-                            margin-top: 20px;
-                            color:darkblue;
-                            font-size:15px">Please do not share this information</p>
-                <p style="text-align:center;
-                            margin-top: 20px;
-                            color:darkblue;
-                            font-size:15px">Your new password is: </p>
-                <p style="text-align:center;
-                            margin-top: 20px;
-                            color:darkblue;
-                            font-size:30px"><strong>${newPassword}</strong></p>
-                <p style="text-align:center;
-                            margin-top: 20px;
-                            color:darkblue;
-                            font-size:15px">Use this OTP to validate and change your password</p>
+    <body>
+        <div class="container">
+            <div class="header">
+                <h1>King Chess</h1>
             </div>
+            <div class="content">
+                <p>Hello <strong>${user.name}</strong>,</p>
+                <p>Your password has been successfully reset. Here is your new auto-generated password:</p>
+                <p class="password">${newPassword}</p>
+                <p>Please do not share this information with anyone.</p>
+                <p>We recommend you to change this password after logging in for enhanced security.</p>
+            </div>
+            <div class="footer">
+                <p>Thank you for using King Chess. If you did not request a password reset, please ignore this email.</p>
+                <p>&copy; 2024 King Chess. All rights reserved.</p>
+            </div>
+        </div>
     </body>
     </html>`;
-    const mailerConfig = {
-      service: "gmail",
-      auth: {
-        user: "testlaravelalala@gmail.com",
-        pass: "coflwwdlhdvdnjsg",
-      },
-    };
-    const transporter = nodemailer.createTransport(mailerConfig);
-    transporter.sendMail({
-      from: '"Airbnb" <AirbnbClone@gmail.com',
+
+    await transporter.sendMail({
+      from: '"King Chess" <no-reply@kingchess.com>',
       to: email,
-      subject: "Reset password",
+      subject: "Reset Password - King Chess",
       html: message,
     });
-    return {
-      status: 200,
-      message: "Congratulation🎉! Check your email for your new password",
-    };
-  } catch (error) {
-    return { status: 404, message: "Catch error" };
+    
+    return { status: 200, message: "You have changed your password" };
+  } catch (err) {
+    console.log(err);
+    throw err;
   }
 };
 
+
 export {
-  checkOTPService,
   forgotPasswordService,
   loginService,
   registerService,
 };
+
