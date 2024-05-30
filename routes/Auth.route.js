@@ -3,11 +3,12 @@ import {
   register,
   login,
   forgotPassword,
-  checkOTP,
+
 } from "../controllers/Auth.controller.js";
 
 const router = express.Router();
 
 router.post("/signUp", register);
 router.post("/signIn", login);
+router.post("/resetPassword", forgotPassword)
 export default router;
