@@ -1,4 +1,5 @@
 import gameModel from "../models/game.model.js";
+import mongoose from "mongoose";
 
 const saveGameService = async (req, res) => {
     try {
@@ -27,7 +28,7 @@ const saveGameService = async (req, res) => {
 
 const loadGameService = async (req, res) => {
     try {
-        const listGame = await gameModel.find({});
+        const listGame = await gameModel.find({}).sort({ game: 1 });
         res.status(200).json({
             status: 200,
             listGame: listGame
@@ -40,4 +41,22 @@ const loadGameService = async (req, res) => {
         });
     }
 };
-export { saveGameService, loadGameService };
+
+const ObjectId = mongoose.Types.ObjectId;
+const loadGameByIdService = async (req, res) => {
+    const id = req.query.id;
+    try {
+        const game = await gameModel.findOne({ "_id": new ObjectId(id) })
+        res.status(200).json({
+            status: 200,
+            game: game
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({
+            status: 500,
+            message: 'Server Error'
+        });
+    }
+}
+export { saveGameService, loadGameService, loadGameByIdService };
