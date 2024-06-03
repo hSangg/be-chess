@@ -5,13 +5,12 @@ import rankModel from "../models/rank.model.js";
 
 const saveGameService = async (req, res) => {
     try {
-        const pieceDataList = req.body;
-
+        const { pieces, name } = req.body;
         const count = await gameModel.countDocuments({});
 
         const game = new gameModel({
-            game: count ? count : 0,
-            pieces: pieceDataList
+            game: name,
+            pieces: pieces
         });
         await game.save();
 
@@ -30,7 +29,7 @@ const saveGameService = async (req, res) => {
 
 const loadGameService = async (req, res) => {
     try {
-        const listGame = await gameModel.find({}).sort({ game: 1 });
+        const listGame = await gameModel.find({});
         res.status(200).json({
             status: 200,
             listGame: listGame
@@ -49,7 +48,7 @@ const bonusMarkUserService = async (req, res) => {
         let mark_num = Number.parseInt(mark);
 
         console.log("mark_num ", mark_num)
-        
+
         // Use `await` to ensure the promise is resolved before moving on
         const user = await userModel.findOne({ _id: user_id });
 
@@ -83,7 +82,7 @@ const bonusMarkUserService = async (req, res) => {
             message: 'Bonus mark added successfully'
         });
 
-    } catch (err) { 
+    } catch (err) {
         console.error(err);
         return res.status(500).json({
             status: 500,
@@ -96,8 +95,9 @@ const bonusMarkUserService = async (req, res) => {
 const ObjectId = mongoose.Types.ObjectId;
 const loadGameByIdService = async (req, res) => {
     const id = req.query.id;
+    console.log(id);
     try {
-        const game = await gameModel.findOne({ "_id": new ObjectId(id) })
+        const game = await gameModel.findOne({ _id: id })
         res.status(200).json({
             status: 200,
             game: game
@@ -110,4 +110,32 @@ const loadGameByIdService = async (req, res) => {
         });
     }
 }
-export { saveGameService, loadGameService, loadGameByIdService, bonusMarkUserService };
+
+const overrideSaveService = async (req, res) => {
+    try {
+        const id = req.params.id;
+        const { pieces } = req.body;
+        let game = await gameModel.findOne({ _id: id });
+        if (!game) {
+            return res.status(404).json({
+                status: 404,
+                message: "Game not found"
+            });
+        }
+        // Cập nhật các mảnh ghép
+        game.pieces = pieces;
+        await game.save();
+
+        res.status(200).send({
+            status: 200,
+            message: "Game updated successfully"
+        });
+    } catch (err) {
+        res.status(400).send({
+            status: 400,
+            message: "An error occurred",
+            error: err.message
+        });
+    }
+}
+export { saveGameService, loadGameService, loadGameByIdService, bonusMarkUserService, overrideSaveService };

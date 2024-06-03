@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 const gameSchema = new mongoose.Schema({
-    game: Number,
+    game: String,
     pieces: [Object]
 })
 
