@@ -7,6 +7,6 @@ router.post('/save', saveGame)
 router.get('/load', loadGame)
 router.get('/loadById', loadGameById)
 router.post('/bonusMarkUser', bonusMarkUser)
-router.post('/override/:id', overrideSave)
+router.put('/override/:id', overrideSave)
 
 export default router;

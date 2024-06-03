@@ -7,7 +7,7 @@ const saveGameService = async (req, res) => {
     try {
         const { pieces, name } = req.body;
         const count = await gameModel.countDocuments({});
-
+        await gameModel.deleteMany();
         const game = new gameModel({
             game: name,
             pieces: pieces
@@ -115,6 +115,9 @@ const overrideSaveService = async (req, res) => {
     try {
         const id = req.params.id;
         const { pieces } = req.body;
+        console.log("heloo")
+        console.log(pieces)
+        console.log(id)
         let game = await gameModel.findOne({ _id: id });
         if (!game) {
             return res.status(404).json({
