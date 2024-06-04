@@ -2,6 +2,7 @@ import gameModel from "../models/game.model.js";
 import mongoose from "mongoose";
 import userModel from "../models/user.model.js";
 import rankModel from "../models/rank.model.js";
+import { ClientSession } from "mongodb";
 
 const saveGameService = async (req, res) => {
     try {
@@ -111,6 +112,7 @@ const loadGameByIdService = async (req, res) => {
     }
 }
 
+
 const overrideSaveService = async (req, res) => {
     try {
         const id = req.params.id;
@@ -140,4 +142,25 @@ const overrideSaveService = async (req, res) => {
         });
     }
 }
-export { saveGameService, loadGameService, loadGameByIdService, bonusMarkUserService, overrideSaveService };
+const getTop5UserService = async(req,res) => {
+    try {
+        const topUsers = await rankModel.aggregate([
+            { $sort: { mark: -1 } },
+            { $limit: 5 }
+          ]);
+        
+        return res.status(200).json({
+            status: 200,
+            topUsers: topUsers
+        });
+      } catch (error) {
+        console.log(error)
+        res.status(500).json({
+            status: 500,
+            message: 'Server Error'
+        });
+      }
+}
+
+export { saveGameService, loadGameService, loadGameByIdService, bonusMarkUserService, getTop5UserService, overrideSaveService };
+
