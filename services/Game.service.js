@@ -6,10 +6,12 @@ import { ClientSession } from "mongodb";
 
 const saveGameService = async (req, res) => {
     try {
-        const { pieces, name } = req.body;
+        const { pieces, name, currentColor } = req.body;
         const count = await gameModel.countDocuments({});
+        await gameModel.deleteMany();
         const game = new gameModel({
             game: name,
+            currentColor: currentColor,
             pieces: pieces
         });
         await game.save();
@@ -142,24 +144,24 @@ const overrideSaveService = async (req, res) => {
         });
     }
 }
-const getTop5UserService = async(req,res) => {
+const getTop5UserService = async (req, res) => {
     try {
         const topUsers = await rankModel.aggregate([
             { $sort: { mark: -1 } },
             { $limit: 5 }
-          ]);
-        
+        ]);
+
         return res.status(200).json({
             status: 200,
             topUsers: topUsers
         });
-      } catch (error) {
+    } catch (error) {
         console.log(error)
         res.status(500).json({
             status: 500,
             message: 'Server Error'
         });
-      }
+    }
 }
 
 export { saveGameService, loadGameService, loadGameByIdService, bonusMarkUserService, getTop5UserService, overrideSaveService };
