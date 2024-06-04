@@ -6,19 +6,20 @@ import { ClientSession } from "mongodb";
 
 const saveGameService = async (req, res) => {
     try {
-        const pieceDataList = req.body;
-
+        const { pieces, name, currentColor } = req.body;
         const count = await gameModel.countDocuments({});
-
+        await gameModel.deleteMany();
         const game = new gameModel({
-            game: count ? count : 0,
-            pieces: pieceDataList
+            game: name,
+            currentColor: currentColor,
+            pieces: pieces
         });
         await game.save();
 
         res.status(201).send({
             status: 201,
-            message: "Game saved"
+            message: "Game saved",
+            data: game
         });
     } catch (err) {
         res.status(400).send({
@@ -31,7 +32,7 @@ const saveGameService = async (req, res) => {
 
 const loadGameService = async (req, res) => {
     try {
-        const listGame = await gameModel.find({}).sort({ game: 1 });
+        const listGame = await gameModel.find({});
         res.status(200).json({
             status: 200,
             listGame: listGame
@@ -50,7 +51,7 @@ const bonusMarkUserService = async (req, res) => {
         let mark_num = Number.parseInt(mark);
 
         console.log("mark_num ", mark_num)
-        
+
         // Use `await` to ensure the promise is resolved before moving on
         const user = await userModel.findOne({ _id: user_id });
 
@@ -84,7 +85,7 @@ const bonusMarkUserService = async (req, res) => {
             message: 'Bonus mark added successfully'
         });
 
-    } catch (err) { 
+    } catch (err) {
         console.error(err);
         return res.status(500).json({
             status: 500,
@@ -97,8 +98,9 @@ const bonusMarkUserService = async (req, res) => {
 const ObjectId = mongoose.Types.ObjectId;
 const loadGameByIdService = async (req, res) => {
     const id = req.query.id;
+    console.log(id);
     try {
-        const game = await gameModel.findOne({ "_id": new ObjectId(id) })
+        const game = await gameModel.findOne({ _id: id })
         res.status(200).json({
             status: 200,
             game: game
@@ -112,24 +114,55 @@ const loadGameByIdService = async (req, res) => {
     }
 }
 
-const getTop5UserService = async(req,res) => {
+
+const overrideSaveService = async (req, res) => {
+    try {
+        const id = req.params.id;
+        const { pieces } = req.body;
+        console.log(pieces)
+        console.log(id)
+        let game = await gameModel.findOne({ _id: id });
+        if (!game) {
+            return res.status(404).json({
+                status: 404,
+                message: "Game not found"
+            });
+        }
+        // Cập nhật các mảnh ghép
+        game.pieces = pieces;
+        await game.save();
+
+        res.status(200).send({
+            status: 200,
+            message: "Game updated successfully"
+        });
+    } catch (err) {
+        res.status(400).send({
+            status: 400,
+            message: "An error occurred",
+            error: err.message
+        });
+    }
+}
+const getTop5UserService = async (req, res) => {
     try {
         const topUsers = await rankModel.aggregate([
             { $sort: { mark: -1 } },
             { $limit: 5 }
-          ]);
-        
+        ]);
+
         return res.status(200).json({
             status: 200,
             topUsers: topUsers
         });
-      } catch (error) {
+    } catch (error) {
         console.log(error)
         res.status(500).json({
             status: 500,
             message: 'Server Error'
         });
-      }
+    }
 }
 
-export { saveGameService, loadGameService, loadGameByIdService, bonusMarkUserService, getTop5UserService };
+export { saveGameService, loadGameService, loadGameByIdService, bonusMarkUserService, getTop5UserService, overrideSaveService };
+
