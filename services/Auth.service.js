@@ -13,27 +13,22 @@ dotenv.config();
 
 const { SECRET_CODE } = process.env.NODE_ENV !== "production";
 
-const registerService = async (req, res) => {
+const registerService = async (data) => {
   try {
-    const { name, password, email } = req.body;
+    const { name, password, email } = data;
 
     if (!name || !password || !email) {
-      return res.status(400).json({
-        status: "FAILED",
-        message: "Missing required fields",
-      });
+      return { user: null, message: "Missing required fields" };
     }
 
     const createdAt = Date.now();
     const saltRounds = 10;
-
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
     const newUser = new User({
       name,
       email,
       password: hashedPassword,
-
       created_at: createdAt,
       update_at: createdAt,
     });
@@ -43,12 +38,7 @@ const registerService = async (req, res) => {
     return { user: savedUser };
   } catch (err) {
     console.error("Error:", err);
-    res.status(500).json({
-      status: "FAILED",
-      message: "An error occurred",
-      error: err.message,
-    });
-    return { user: null };
+    return { user: null, error: err.message };
   }
 };
 

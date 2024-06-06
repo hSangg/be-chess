@@ -5,12 +5,26 @@ import {
 } from "../services/Auth.service.js";
 
 const register = async (req, res) => {
-  const { user } = await registerService(req, res);
-  if (user) {
-    res.status(201).json({
-      status: "SUCCESS",
-      message: "Account created",
-      data: user,
+  try {
+    const { user, error, message } = await registerService(req.body);
+    if (user) {
+      res.status(201).json({
+        status: "SUCCESS",
+        message: "Account created",
+        data: user,
+      });
+    } else {
+      res.status(400).json({
+        status: "FAILED",
+        message: message || "Account creation failed",
+        error: error,
+      });
+    }
+  } catch (err) {
+    res.status(500).json({
+      status: "FAILED",
+      message: "An error occurred",
+      error: err.message,
     });
   }
 };
